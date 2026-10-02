@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiskLayer ASPM - Análise de Vulnerabilidades</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#0f172a',
+                        critical: '#ef4444',
+                        high: '#f97316',
+                        medium: '#eab308',
+                        low: '#3b82f6',
+                        info: '#64748b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+    <header class="bg-brand text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved"></i> RiskLayer ASPM
+            </h1>
+            <div id="api-status" class="text-sm flex items-center gap-2 text-gray-300">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Verificando API...
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <section id="upload-section" class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Nova Análise de Código (SARIF)</h2>
+            <p class="text-gray-600 mb-6 text-sm">
+                Achados HIGH/CRITICAL são analisados via Gemini (nuvem); MEDIUM/LOW/INFO, via Llama 3 (local),
+                com fallback automático entre os dois. O código-fonte nunca é enviado: apenas metadados do achado
+                (regra, CWE, severidade, arquivo:linha e mensagem do scanner).
+            </p>
+            
+            <form id="upload-form" class="flex flex-col gap-4">
+                <div class="flex items-center justify-center w-full">
+                    <label for="sarif-file" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-3"></i>
+                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Clique para fazer upload</span> ou arraste o arquivo</p>
+                            <p class="text-xs text-gray-500">Arquivos .sarif ou .json (Máx: 5MB / 100 achados)</p>
+                        </div>
+                        <input id="sarif-file" type="file" class="hidden" accept=".sarif,.json" />
+                    </label>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                    <span id="file-name" class="text-sm font-medium text-brand">Nenhum arquivo selecionado</span>
+                    <button type="submit" id="btn-analisar" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        Iniciar Análise <i class="fa-solid fa-microchip ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section id="loading-section" class="hidden flex-col items-center justify-center py-16">
+            <i class="fa-solid fa-circle-notch fa-spin text-5xl text-blue-600 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700">A IA está analisando os achados...</h3>
+            <p class="text-gray-500 mt-2 text-center max-w-md">Isto pode levar de alguns segundos a minutos dependendo da quantidade de vulnerabilidades. Por favor, aguarde.</p>
+        </section>
+
+        <section id="error-section" class="hidden bg-red-50 border-l-4 border-red-500 p-4 mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Erro na Análise</h3>
+                    <div class="mt-2 text-sm text-red-700" id="error-message"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="results-section" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Relatório de Postura (ASPM)</h2>
+                <a id="btn-pdf" href="#" target="_blank" class="hidden bg-brand hover:bg-gray-800 text-white px-4 py-2 rounded shadow-sm text-sm font-medium transition">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> Baixar Relatório PDF
+                </a>
+            </div>
+
+            <div id="summary-cards" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"></div>
+
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 class="font-semibold text-lg">Achados Detalhados (<span id="total-achados">0</span>)</h3>
+                </div>
+                <div id="findings-container" class="divide-y divide-gray-200"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const API_BASE = window.location.origin;
+        
+        const fileInput = document.getElementById('sarif-file');
+        const fileNameDisplay = document.getElementById('file-name');
+        const form = document.getElementById('upload-form');
+        const btnAnalisar = document.getElementById('btn-analisar');
+        
+        const uploadSec = document.getElementById('upload-section');
+        const loadingSec = document.getElementById('loading-section');
+        const resultsSec = document.getElementById('results-section');
+        const errorSec = document.getElementById('error-section');
+        const errorMessage = document.getElementById('error-message');
+
+        const severityColors = {
+            'CRITICAL': 'bg-critical text-white',
+            'HIGH': 'bg-high text-white',
+            'MEDIUM': 'bg-medium text-white',
+            'LOW': 'bg-low text-white',
+            'INFO': 'bg-info text-white'
+        };
+
+        async function checkApiStatus() {
+            const statusDiv = document.getElementById('api-status');
+            try {
+                const res = await fetch(`${API_BASE}/`);
+                if (res.ok) {
+                    statusDiv.innerHTML = '<i class="fa-solid fa-circle-check text-green-400"></i> API Online';
+                } else {
+                    throw new Error('API Offline');
+                }
+            } catch (e) {
+                statusDiv.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-400"></i> API Offline';
+                btnAnalisar.disabled = true;
+            }
+        }
+        checkApiStatus();
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileNameDisplay.textContent = e.target.files[0].name;
+            }
+        });
+
+        function mostrarErro(msg) {
+            errorMessage.textContent = msg;
+            errorSec.classList.remove('hidden');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorSec.classList.add('hidden');
+
+            const file = fileInput.files[0];
+            if (!file) { mostrarErro('Selecione um arquivo .sarif ou .json antes de iniciar.'); return; }
+            if (!/\.(sarif|json)$/i.test(file.name)) { mostrarErro('O arquivo deve ter extensão .sarif ou .json.'); return; }
+            if (file.size > 5 * 1024 * 1024) { mostrarErro('O arquivo excede o limite de 5 MB.'); return; }
+
+            resultsSec.classList.add('hidden');
+            loadingSec.classList.replace('hidden', 'flex');
+            btnAnalisar.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/analisar-sarif`, { method: 'POST', body: formData });
+                let data = {};
+                try { data = await response.json(); } catch (_) {}
+                if (!response.ok) throw new Error(data.detail || `Erro ${response.status} no servidor.`);
+                renderResults(data);
+            } catch (error) {
+                mostrarErro(error.message);
+            } finally {
+                loadingSec.classList.replace('flex', 'hidden');
+                btnAnalisar.disabled = false;
+            }
+        });
+
+        const dropZone = document.querySelector('label[for="sarif-file"]');
+        ['dragenter', 'dragover'].forEach(ev => dropZone.addEventListener(ev, e => {
+            e.preventDefault(); dropZone.classList.add('bg-gray-100');
+        }));
+        ['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, e => {
+            e.preventDefault(); dropZone.classList.remove('bg-gray-100');
+        }));
+        dropZone.addEventListener('drop', e => {
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileNameDisplay.textContent = fileInput.files[0].name;
+            }
+        });
+        window.addEventListener('dragover', e => e.preventDefault());
+        window.addEventListener('drop', e => e.preventDefault());
+
+        function esc(valor) {
+            return String(valor ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderResults(data) {
+            resultsSec.classList.remove('hidden');
+
+            const btnPdf = document.getElementById('btn-pdf');
+            if (data.download_pdf_url) {
+                btnPdf.href = `${API_BASE}${data.download_pdf_url}`;
+                btnPdf.classList.remove('hidden');
+                btnPdf.classList.add('inline-flex');
+            } else {
+                btnPdf.classList.add('hidden');
+                btnPdf.classList.remove('inline-flex');
+            }
+
+            const resumo = [];
+            if (data.analises_com_erro > 0) {
+                resumo.push(`
+                    <div class="col-span-full bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm rounded-lg p-3">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                        ${esc(data.analises_com_erro)} achado(s) ficaram sem análise de IA (provedores indisponíveis).
+                    </div>`);
+            }
+            for (const [sev, count] of Object.entries(data.resumo_severidade || {})) {
+                const cor = severityColors[sev]?.split(' ')[0].replace('bg-', 'text-') || 'text-gray-800';
+                resumo.push(`
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 text-center">
+                        <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">${esc(sev)}</div>
+                        <div class="text-3xl font-bold mt-1 ${cor}">${esc(count)}</div>
+                    </div>`);
+            }
+            document.getElementById('summary-cards').innerHTML = resumo.join('');
+
+            document.getElementById('total-achados').textContent = data.total_achados || 0;
+            const container = document.getElementById('findings-container');
+
+            if (!data.total_achados) {
+                container.innerHTML = `<div class="p-6 text-center text-gray-500">${esc(data.mensagem || 'Nenhuma vulnerabilidade encontrada.')}</div>`;
+                return;
+            }
+
+            container.innerHTML = (data.achados || []).map(achado => {
+                const ia = achado.analise_ia || {};
+                const sevColor = severityColors[achado.severity] || 'bg-gray-200 text-gray-800';
+                const fallback = Array.isArray(ia.fallback) ? ia.fallback : [];
+
+                const iaContent = ia.status === 'ok' ? `
+                    <div class="mt-4 p-4 bg-gray-50 rounded border border-gray-200">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="text-xs font-semibold px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                <i class="fa-solid fa-robot"></i> Analisado por ${ia.modelo === 'gemini' ? 'Gemini (Nuvem)' : 'Llama 3 (Local)'}
+                            </span>
+                            ${fallback.length ? `<span class="text-xs font-semibold px-2 py-1 bg-yellow-100 text-yellow-800 rounded" title="${esc(fallback.join(' | '))}"><i class="fa-solid fa-code-branch"></i> Fallback Ativado</span>` : ''}
+                            ${ia.contexto_rag && ia.contexto_rag !== 'completo' ? `<span class="text-xs font-semibold px-2 py-1 bg-gray-200 text-gray-700 rounded"><i class="fa-solid fa-book-open-reader"></i> Contexto RAG: ${esc(ia.contexto_rag)}</span>` : ''}
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-sm text-gray-700 block mb-1">Impacto (Diagnosticado pela IA):</strong>
+                            <p class="text-sm text-gray-600">${esc(ia.impacto)}</p>
+                        </div>
+                        <div>
+                            <strong class="text-sm text-gray-700 block mb-1">Recomendação de Correção:</strong>
+                            <p class="text-sm text-gray-600">${esc(ia.recomendacao)}</p>
+                        </div>
+                    </div>` : `
+                    <div class="mt-4 p-4 bg-red-50 rounded border border-red-200 text-red-700 text-sm flex items-start gap-2">
+                        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                        <div>
+                            <strong>Análise de IA Indisponível</strong>
+                            <p class="mt-1">${esc(ia.erro || 'Falha ao processar achado com os modelos de linguagem.')}</p>
+                        </div>
+                    </div>`;
+
+                return `
+                    <div class="p-6 hover:bg-gray-50 transition">
+                        <div class="flex justify-between items-start mb-2 gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="${sevColor} px-2 py-1 rounded text-xs font-bold tracking-wider">${esc(achado.severity)}</span>
+                                <h4 class="text-lg font-semibold text-gray-800 break-all">${esc(achado.rule_id)}</h4>
+                            </div>
+                            <span class="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded"><i class="fa-solid fa-file-code mr-1"></i> ${esc(achado.location)}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-3 text-xs text-gray-600">
+                            <span class="border border-gray-300 px-2 py-1 rounded"><i class="fa-solid fa-shield-virus mr-1"></i> ${esc(achado.type)}</span>
+                            ${achado.cwe ? `<span class="border border-gray-300 px-2 py-1 rounded"><i class="fa-solid fa-bug mr-1"></i> ${esc(achado.cwe)}</span>` : ''}
+                            <span class="border border-gray-300 px-2 py-1 rounded"><i class="fa-solid fa-search mr-1"></i> Scanner: ${esc(achado.scanner)}</span>
+                        </div>
+                        <p class="text-sm text-gray-700 mb-2">${esc(achado.description)}</p>
+                        ${iaContent}
+                    </div>`;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

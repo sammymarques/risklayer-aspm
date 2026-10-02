@@ -1,0 +1,29 @@
+{
+  "version": "2.1.0",
+  "runs": [{
+    "tool": {"driver": {"name": "Semgrep", "rules": [
+      {"id": "python.lang.security.audit.sqli.sql-injection",
+       "properties": {"cwe": ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]}},
+      {"id": "python.lang.security.audit.hardcoded-credentials",
+       "properties": {"cwe": ["CWE-798: Use of Hard-coded Credentials"]}},
+      {"id": "python.flask.security.audit.cookie-missing-httponly",
+       "properties": {"cwe": ["CWE-1004: Sensitive Cookie Without 'HttpOnly' Flag"]}},
+      {"id": "python.flask.security.xss.unescaped-template-variable",
+       "properties": {"cwe": ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"]}}
+    ]}},
+    "results": [
+      {"ruleId": "python.lang.security.audit.sqli.sql-injection", "level": "error",
+       "message": {"text": "Concatenação direta de entrada do usuário em consulta SQL."},
+       "locations": [{"physicalLocation": {"artifactLocation": {"uri": "app/auth.py"}, "region": {"startLine": 45}}}]},
+      {"ruleId": "python.lang.security.audit.hardcoded-credentials", "level": "error",
+       "message": {"text": "Senha de banco de dados definida diretamente no código-fonte."},
+       "locations": [{"physicalLocation": {"artifactLocation": {"uri": "app/config.py"}, "region": {"startLine": 12}}}]},
+      {"ruleId": "python.flask.security.audit.cookie-missing-httponly", "level": "warning",
+       "message": {"text": "Cookie de sessão definido sem o atributo HttpOnly."},
+       "locations": [{"physicalLocation": {"artifactLocation": {"uri": "app/controllers/auth.py"}, "region": {"startLine": 58}}}]},
+      {"ruleId": "python.flask.security.xss.unescaped-template-variable", "level": "warning",
+       "message": {"text": "Variável renderizada no template sem escape, permitindo XSS refletido."},
+       "locations": [{"physicalLocation": {"artifactLocation": {"uri": "app/views/profile.py"}, "region": {"startLine": 23}}}]}
+    ]
+  }]
+}

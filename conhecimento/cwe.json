@@ -1,0 +1,47 @@
+{
+  "CWE-89": {
+    "nome": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+    "categoria_owasp": "A05:2025-Injection",
+    "descricao": "A aplicação constrói comandos SQL utilizando entradas não higienizadas do usuário, permitindo a manipulação da estrutura da consulta."
+  },
+  "CWE-79": {
+    "nome": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+    "categoria_owasp": "A05:2025-Injection",
+    "descricao": "A aplicação recebe dados não confiáveis e os envia ao navegador sem validação ou codificação adequada."
+  },
+  "CWE-200": {
+    "nome": "Exposure of Sensitive Information to an Unauthorized Actor",
+    "categoria_owasp": "A01:2025-Broken Access Control",
+    "descricao": "Informações confidenciais são expostas a usuários que não possuem autorização explícita para visualizá-las."
+  },
+  "CWE-918": {
+    "nome": "Server-Side Request Forgery (SSRF)",
+    "categoria_owasp": "A01:2025-Broken Access Control",
+    "descricao": "O servidor web realiza requisições para URLs fornecidas pelo usuário sem validação adequada."
+  },
+  "CWE-1395": {
+    "nome": "Dependency on Vulnerable Third-Party Component",
+    "categoria_owasp": "A03:2025-Software Supply Chain Failures",
+    "descricao": "O software utiliza pacotes ou bibliotecas de terceiros contendo vulnerabilidades conhecidas."
+  },
+  "CWE-798": {
+    "nome": "Use of Hard-coded Credentials",
+    "categoria_owasp": "A07:2025-Authentication Failures",
+    "descricao": "O código contém credenciais estáticas armazenadas diretamente em seu conteúdo."
+  },
+  "CWE-209": {
+    "nome": "Generation of Error Message Containing Sensitive Information",
+    "categoria_owasp": "A10:2025-Mishandling of Exceptional Conditions",
+    "descricao": "A aplicação gera mensagens de erro contendo detalhes internos do ambiente ou trechos do código ao deparar-se com exceções."
+  },
+  "CWE-1004": {
+    "nome": "Sensitive Cookie Without 'HttpOnly' Flag",
+    "categoria_owasp": "A02:2025-Security Misconfiguration",
+    "descricao": "Cookies sensíveis são emitidos sem o atributo HttpOnly, permitindo que scripts no navegador leiam seu conteúdo em caso de XSS."
+  },
+  "CWE-284": {
+    "nome": "Improper Access Control",
+    "categoria_owasp": "A01:2025-Broken Access Control",
+    "descricao": "O software não restringe, ou restringe de forma incorreta, o acesso de um ator não autorizado a um recurso."
+  }
+}

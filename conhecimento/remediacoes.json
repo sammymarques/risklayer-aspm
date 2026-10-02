@@ -1,0 +1,16 @@
+{
+  "A01:2025-Broken Access Control": "Implemente controle de acesso baseado em funções (RBAC) ou atributos (ABAC). Negue o acesso por padrão (deny-by-default) e valide permissões no servidor. Para chamadas externas, valide estritamente a lista de permissões de URLs (allowlist).",
+  "A02:2025-Security Misconfiguration": "Automatize o endurecimento (hardening) de ambientes. Desative recursos e portas desnecessários, oculte mensagens de erro detalhadas em produção e aplique cabeçalhos de segurança HTTP rígidos.",
+  "A03:2025-Software Supply Chain Failures": "Utilize ferramentas de Software Composition Analysis (SCA). Mantenha um Inventário de Componentes (SBOM), assine digitalmente os artefatos de compilação e bloqueie atualizações de dependências não auditadas no CI/CD.",
+  "A04:2025-Cryptographic Failures": "Empregue algoritmos de criptografia modernos (ex: AES-256, RSA-3072+). Para senhas, utilize algoritmos de hash seguros como Argon2id ou bcrypt. Utilize cofres de chaves para armazenar segredos.",
+  "A05:2025-Injection": "Utilize consultas parametrizadas (Prepared Statements) ou ORMs seguros. Aplique sanitização e validação de entradas baseadas em listas de permissão.",
+  "A06:2025-Insecure Design": "Incorpore modelagem de ameaças (Threat Modeling) nas fases iniciais de desenvolvimento e adote padrões de arquitetura de segurança validados.",
+  "A07:2025-Authentication Failures": "Implemente autenticação multifator (MFA), aplique políticas de senha fortes e proteja endpoints contra ataques de força bruta.",
+  "A08:2025-Software or Data Integrity Failures": "Exija assinaturas digitais ou hashes de verificação antes de executar artefatos, scripts ou atualizar componentes do sistema.",
+  "A09:2025-Security Logging & Alerting Failures": "Centralize os logs de auditoria em um sistema SIEM e configure alertas automáticos em tempo real para comportamentos suspeitos ou recorrentes.",
+  "A10:2025-Mishandling of Exceptional Conditions": "Trate exceções explicitamente no código, adote a abordagem 'fail-closed' (falhar com segurança) e evite expor stack traces ou dados sensíveis nas respostas de erro enviadas ao cliente.",
+  "CWE-89": "Troque a concatenação de strings por consultas parametrizadas, por exemplo cursor.execute('SELECT ... WHERE id = %s', (id,)), ou use um ORM.",
+  "CWE-798": "Remova credenciais do código, rotacione as que já foram expostas e carregue segredos de variáveis de ambiente ou de um cofre (Vault, AWS Secrets Manager).",
+  "CWE-1004": "Defina HttpOnly (e também Secure e SameSite) nos cookies de sessão; no Flask, use SESSION_COOKIE_HTTPONLY=True ou set_cookie(..., httponly=True)."
+
+}

@@ -1,0 +1,29 @@
+services:
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"   # só a sua máquina; para outras máquinas, use "8000:8000" e defina RISKLAYER_API_KEY
+    env_file: .env              # GEMINI_API_KEY etc. entram em runtime, não na imagem
+    environment:
+      # Padrão: Ollama instalado no Windows. Colegas sem Ollama: veja a nota abaixo.
+      OLLAMA_HOST: ${OLLAMA_URL_DOCKER:-http://host.docker.internal:11434}
+      OLLAMA_READ_TIMEOUT: "180"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # necessário no Linux; inofensivo no Docker Desktop
+    volumes:
+      - resultados:/app/resultados
+    restart: unless-stopped
+
+  # Só sobe com: docker compose --profile ollama up -d --build
+  ollama:
+    profiles: ["ollama"]
+    image: ollama/ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: 30m
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  resultados:
+  ollama_models:

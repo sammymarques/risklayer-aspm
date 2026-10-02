@@ -1,0 +1,12 @@
+{
+  "A01:2025-Broken Access Control": "Falhas no controle de acesso permitem que usuários executem ações fora de suas permissões, acessem dados sensíveis ou alterem direitos de acesso. Esta categoria agora também absorve vulnerabilidades de Server-Side Request Forgery (SSRF).",
+  "A02:2025-Security Misconfiguration": "Configurações de segurança incorretas ou padrão em servidores, nuvem, containers ou aplicações, como portas abertas desnecessárias, mensagens de erro detalhadas e cabeçalhos HTTP ausentes.",
+  "A03:2025-Software Supply Chain Failures": "Comprometimentos em dependências de software, bibliotecas de terceiros, pipelines de CI/CD ou repositórios que introduzem código malicioso ou vulnerabilidades conhecidas.",
+  "A04:2025-Cryptographic Failures": "Exposição de dados sensíveis em trânsito ou em repouso por ausência, fraqueza ou implementação incorreta de criptografia e gerenciamento de chaves.",
+  "A05:2025-Injection": "Ocorre quando dados não confiáveis são enviados para um interpretador como parte de um comando ou consulta (ex: SQL, OS Command, XSS), executando comandos não previstos.",
+  "A06:2025-Insecure Design": "Ausência ou deficiência de controles de segurança na fase de arquitetura e design da aplicação, como falta de modelagem de ameaças e padrões de projeto inseguros.",
+  "A07:2025-Authentication Failures": "Falhas no gerenciamento de sessões ou confirmação de identidade do usuário, permitindo força bruta, fixação de sessão ou sequestro de contas.",
+  "A08:2025-Software or Data Integrity Failures": "Falta de verificação da integridade de dados, artefatos ou atualizações de software antes de sua execução ou processamento.",
+  "A09:2025-Security Logging & Alerting Failures": "Insuficiência ou ausência de registros de auditoria (logs) e mecanismos automáticos de alerta, impedindo a detecção e reação rápida a incidentes de segurança.",
+  "A10:2025-Mishandling of Exceptional Conditions": "Tratamento inadequado de erros, exceções não capturadas, comportamentos inesperados ao falhar e exibição de detalhes internos do sistema em situações atípicas."
+}

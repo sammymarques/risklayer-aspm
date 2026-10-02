@@ -1,0 +1,20 @@
+# Segredos
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Resultados gerados (mantém só a pasta)
+resultados/*
+!resultados/.gitkeep
+
+# Editor / sistema
+.vscode/
+.idea/
+Thumbs.db
