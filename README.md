@@ -133,9 +133,9 @@ Distribuído sob a licença **BSD 3-Clause**. Veja o arquivo [LICENSE.md](LICENS
 
 ## Autores
 
-| Nome | Responsabilidade | GitHub |
+| Nome e RM | Responsabilidade | GitHub |
 |---|---|---|
 
-| Samuel de Oliveira Marques | Módulo de IA (API, parser SARIF, RAG, IA híbrida, relatórios) e interface de demonstração | [@sammymarques](https://github.com/sammymarques) |
+| Samuel de Oliveira Marques RM: 573470 | Módulo de IA (API, parser SARIF, RAG, IA híbrida, relatórios) e interface de demonstração | [@sammymarques](https://github.com/sammymarques) |
 
-| Vladmir Aleiksander Pugliesi Vilasboas di Araujo | Front-end original em React | [@bytedump](https://github.com/bytedump) |
+| Vladmir Aleiksander Pugliesi Vilasboas di Araujo RM: 568902 | Front-end original em React | [@bytedump](https://github.com/bytedump) |
