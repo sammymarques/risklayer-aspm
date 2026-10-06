@@ -48,6 +48,22 @@ cp .env.example .env               # depois edite o .env e preencha GEMINI_API_K
 | `CORS_ORIGINS` | Origens permitidas, separadas por vírgula | `*` |
 | `LOG_LEVEL` | `INFO` ou `DEBUG` | `INFO` |
 
+## Usando a interface web
+
+1. Deixe o **Ollama** rodando (abra o aplicativo ou rode `ollama serve`) e confirme que o `.env` tem a `GEMINI_API_KEY`.
+2. Inicie o servidor na raiz do projeto:
+
+```bash
+   python -m uvicorn main:app --port 8000
+```
+
+3. Abra no navegador: **http://127.0.0.1:8000/app**
+4. Clique na área de upload (ou arraste o arquivo) e selecione um SARIF. Há um exemplo pronto em `parser/exemplo_demo.sarif`.
+5. Clique em **Iniciar Análise**. A IA analisa cada achado em sequência, então pode levar de alguns segundos a alguns minutos.
+6. Veja o resumo por severidade e os achados com impacto e recomendação, e use **Baixar Relatório PDF** para o relatório completo.
+
+Documentação interativa da API (Swagger): http://127.0.0.1:8000/docs
+
 ## Como executar
 
 ```bash
@@ -116,7 +132,10 @@ Distribuído sob a licença **BSD 3-Clause**. Veja o arquivo [LICENSE.md](LICENS
 
 
 ## Autores
-| Samuel de Oliveira Marques | Módulo de IA (API, parser SARIF, RAG, IA híbrida, relatórios) e interface de demonstração | [@sammymarques]
-(https://github.com/sammymarques) |
+
+| Nome | Responsabilidade | GitHub |
+|---|---|---|
+
+| Samuel de Oliveira Marques | Módulo de IA (API, parser SARIF, RAG, IA híbrida, relatórios) e interface de demonstração | [@SEU_USUARIO](https://github.com/sammymarques) |
 
 | Vladmir Aleiksander Pugliesi Vilasboas di Araujo | Front-end original em React | [@bytedump](https://github.com/bytedump) |
