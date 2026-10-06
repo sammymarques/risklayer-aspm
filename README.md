@@ -24,7 +24,7 @@ A API recebe relatórios de vulnerabilidades no formato **SARIF**, normaliza sev
 ## Instalação
 
 ```bash
-git clone https://github.com/SEU_USUARIO/risklayer-aspm.git
+git clone https://github.com/sammymarques/risklayer-aspm.git
 cd risklayer-aspm
 python -m venv .venv
 source .venv/Scripts/activate      # Git Bash no Windows (Linux/macOS: source .venv/bin/activate)
@@ -114,6 +114,9 @@ Distribuído sob a licença **BSD 3-Clause**. Veja o arquivo [LICENSE.md](LICENS
 - **SARIF** é um padrão do OASIS.
 - Bibliotecas de terceiros (FastAPI, Pydantic, Uvicorn, FPDF2, google-genai, Requests, python-dotenv e outras) são instaladas via `pip`, cada uma sob a sua própria licença. A interface carrega Tailwind CSS e Font Awesome por CDN.
 
-## Autores
 
-__AUTORES__
+## Autores
+| Samuel de Oliveira Marques | Módulo de IA (API, parser SARIF, RAG, IA híbrida, relatórios) e interface de demonstração | [@sammymarques]
+(https://github.com/sammymarques) |
+
+| Vladmir Aleiksander Pugliesi Vilasboas di Araujo | Front-end original em React | [@bytedump](https://github.com/bytedump) |

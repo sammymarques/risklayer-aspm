@@ -4,7 +4,7 @@ import os
 import re
 
 ANO = "2026"
-AUTORES = "NOME 1, NOME 2, NOME 3"  # <-- EDITE: todos os integrantes do grupo
+AUTORES = "Samuel de Oliveira Marques, Vladmir Aleiksander Pugliesi Vilasboas di Araujo"  # <-- EDITE: todos os integrantes do grupo
 IGNORAR = {".git", "__pycache__", ".venv", "venv", ".pytest_cache", "resultados", "node_modules"}
 
 LINHAS = [
